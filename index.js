@@ -8,7 +8,7 @@ app.use(cors())
 app.use(express.json())
 
 // Configuración Baserow
-const BASEROW_URL = process.env.BASEROW_URL || 'http://localhost:8080'
+const BASEROW_URL = process.env.BASEROW_URL || 'http://91.134.140.213:8080'
 const BASEROW_EMAIL = process.env.BASEROW_EMAIL || 'hdcpy2019@gmail.com'
 const BASEROW_PASSWORD = process.env.BASEROW_PASSWORD || 'edgar123'
 
