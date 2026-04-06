@@ -234,3 +234,115 @@ app.listen(PORT, () => {
   console.log(`🚀 Sapore Backend corriendo en puerto ${PORT}`)
   console.log(`📡 Conectando a Baserow en ${BASEROW_URL}`)
 })
+
+// ==================== CARTA ====================
+
+// Obtener carta
+app.get('/api/carta/:tableId', async (req, res) => {
+  try {
+    const { tableId } = req.params
+    const response = await baserowRequest('GET', `/api/database/rows/table/${tableId}/?user_field_names=true&size=200`)
+    res.json(response.data.results || [])
+  } catch (error) {
+    res.status(500).json({ error: 'Error obteniendo carta' })
+  }
+})
+
+// ==================== CLIENTES ====================
+
+app.get('/api/clientes', async (req, res) => {
+  try {
+    const response = await baserowRequest('GET', `/api/database/rows/table/793/?user_field_names=true&size=100`)
+    res.json(response.data.results || [])
+  } catch (error) {
+    res.status(500).json({ error: 'Error obteniendo clientes' })
+  }
+})
+
+app.post('/api/clientes', async (req, res) => {
+  try {
+    const data = {
+      ...req.body,
+      'Fecha_registro': new Date().toISOString().split('T')[0]
+    }
+    const response = await baserowRequest('POST', `/api/database/rows/table/793/?user_field_names=true`, data)
+    res.json(response.data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error creando cliente' })
+  }
+})
+
+app.post('/api/clientes/login', async (req, res) => {
+  try {
+    const { email, password } = req.body
+    const response = await baserowRequest('GET', `/api/database/rows/table/793/?user_field_names=true&size=100`)
+    const clientes = response.data.results || []
+    const cliente = clientes.find(c => c.Email === email && c.Password === password)
+    
+    if (cliente) {
+      res.json(cliente)
+    } else {
+      res.status(401).json({ error: 'Credenciales incorrectas' })
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Error en login' })
+  }
+})
+
+// ==================== PEDIDOS ONLINE ====================
+
+app.get('/api/pedidos', async (req, res) => {
+  try {
+    const response = await baserowRequest('GET', `/api/database/rows/table/794/?user_field_names=true&size=100`)
+    res.json(response.data.results || [])
+  } catch (error) {
+    res.status(500).json({ error: 'Error obteniendo pedidos' })
+  }
+})
+
+app.post('/api/pedidos', async (req, res) => {
+  try {
+    const data = {
+      ...req.body,
+      'Fecha_pedido': new Date().toISOString().split('T')[0],
+      'Estado': 'Pendiente'
+    }
+    const response = await baserowRequest('POST', `/api/database/rows/table/794/?user_field_names=true`, data)
+    res.json(response.data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error creando pedido' })
+  }
+})
+
+// ==================== LISTA DESEOS ====================
+
+app.get('/api/deseos', async (req, res) => {
+  try {
+    const response = await baserowRequest('GET', `/api/database/rows/table/795/?user_field_names=true&size=100`)
+    res.json(response.data.results || [])
+  } catch (error) {
+    res.status(500).json({ error: 'Error obteniendo deseos' })
+  }
+})
+
+app.post('/api/deseos', async (req, res) => {
+  try {
+    const data = {
+      ...req.body,
+      'Fecha': new Date().toISOString().split('T')[0]
+    }
+    const response = await baserowRequest('POST', `/api/database/rows/table/795/?user_field_names=true`, data)
+    res.json(response.data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error añadiendo a deseos' })
+  }
+})
+
+app.delete('/api/deseos/:id', async (req, res) => {
+  try {
+    await baserowRequest('DELETE', `/api/database/rows/table/795/${req.params.id}/`)
+    res.json({ success: true })
+  } catch (error) {
+    res.status(500).json({ error: 'Error eliminando deseo' })
+  }
+})
